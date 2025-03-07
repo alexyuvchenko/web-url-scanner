@@ -153,3 +153,6 @@ flycheck_*
 
 # PyPI configuration file
 .pypirc
+
+#logs
+logs/*

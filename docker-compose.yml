@@ -1,0 +1,13 @@
+services:
+  web-url-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./logs:/app/logs  # Mount logs directory
+      - ./src:/app/src    # Mount source code for development
+    environment:
+      - PYTHONUNBUFFERED=1  # Ensure Python output is sent straight to container logs
+    command: python -m web_url_scanner.scanner
+    stop_signal: SIGTERM
+    stop_grace_period: 10s 
