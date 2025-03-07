@@ -5,6 +5,8 @@ Logging configuration for the URL Scanner.
 import logging
 from pathlib import Path
 
+from src.web_url_scanner.config import LOGS_DIR
+
 
 def setup_logger(log_file: str = "scanner.log") -> logging.Logger:
     """
@@ -16,10 +18,8 @@ def setup_logger(log_file: str = "scanner.log") -> logging.Logger:
     Returns:
         logging.Logger: Configured logger instance.
     """
-    # Create logs directory if it doesn't exist
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-    log_path = log_dir / log_file
+    # Use the logs directory from config
+    log_path = LOGS_DIR / log_file
 
     # Configure logging
     logging.basicConfig(

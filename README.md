@@ -14,7 +14,7 @@ A Python-based web scanner that scans websites and generates reports of all link
 
 ## Prerequisites
 
-- Python 3.13.1 or higher
+- Python 3.13.1+
 - Docker and Docker Compose (for containerized usage)
 - Make (optional, for using provided commands)
 

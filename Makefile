@@ -20,8 +20,6 @@ logs:
 setup-local:
 	chmod +x scripts/setup_local.sh
 	./scripts/setup_local.sh
-	@echo "Installing package in development mode..."
-	source .venv/bin/activate && pip install -e .
 
 run-local:
 	@if [ -d ".venv" ]; then \

@@ -154,5 +154,8 @@ flycheck_*
 # PyPI configuration file
 .pypirc
 
-#logs
+# logs
 logs/*
+
+# reports
+reports/*

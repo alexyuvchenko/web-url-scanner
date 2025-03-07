@@ -53,35 +53,16 @@ fi
 echo "Creating virtual environment..."
 python3 -m venv .venv
 
-# Activate virtual environment
-source .venv/bin/activate
-
-# Setup poetry
-if ! command -v poetry &> /dev/null; then
-    echo "Installing poetry..."
-    curl -sSL https://install.python-poetry.org | python3 -
-
-    # Add poetry to PATH for this session
-    export PATH="$HOME/.local/bin:$PATH"
-fi
-
-# Verify poetry installation
-if ! command -v poetry &> /dev/null; then
-    echo "Poetry installation failed or not in PATH"
-    echo "Please add the following line to your ~/.zshrc:"
-    echo 'export PATH="$HOME/.local/bin:$PATH"'
-    echo "Then restart your terminal and run this script again"
-    exit 1
-fi
+# Setup virtual environment
+source .venv/bin/activate && pip install --upgrade pip && pip install poetry
 
 # Configure poetry to use the local virtual environment
 poetry config virtualenvs.in-project true
 poetry config virtualenvs.path ".venv"
 
-# Clean poetry cache and install dependencies
+# Install dependencies
 echo "Installing project dependencies..."
-poetry cache clear . --all
-poetry install
+poetry install --no-interaction
 
 echo "Local development environment setup complete!"
 echo "Python version: $(python3 -V)"
