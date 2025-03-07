@@ -6,7 +6,7 @@ import re
 import os
 import asyncio
 import csv
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, Set, Optional
 from urllib.parse import urljoin, urlparse
@@ -31,7 +31,24 @@ class ScannerConfig:
     rate_limit: Optional[float] = None
     max_urls: int = 10000
     max_file_size_mb: int = 100
-    user_agent: str = "WebURLScanner/1.0"
+    headers: Dict[str, str] = None
+    
+    def __post_init__(self):
+        if self.headers is None:
+            self.headers = {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:135.0) Gecko/20100101 Firefox/135.0",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+                "Accept-Encoding": "gzip, deflate, br",
+                "DNT": "1",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1",
+                "Cache-Control": "max-age=0"
+            }
 
 
 class WebUrlScanner:
@@ -90,7 +107,7 @@ class WebUrlScanner:
 
         try:
             response = await client.get(
-                url, timeout=self.config.timeout, headers={"User-Agent": self.config.user_agent}
+                url, timeout=self.config.timeout, headers=self.config.headers
             )
             if response.status_code == httpx.codes.OK:
                 return response.text
@@ -98,6 +115,10 @@ class WebUrlScanner:
                 self.broken_urls.add(url)
                 logger.error(f"Broken link found: {url} (Status: {response.status_code})")
                 return ""
+        except httpx.TimeoutException:
+            self.broken_urls.add(url)
+            logger.error(f"Timeout error fetching {url} (timeout: {self.config.timeout}s)")
+            return ""
         except Exception as e:
             self.broken_urls.add(url)
             logger.error(f"Error fetching {url}: {str(e)}")
@@ -176,12 +197,12 @@ class WebUrlScanner:
 
         with open(self.output_file, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["URL", "Depth", "Status", "Timestamp"])
+            writer.writerow(["Timestamp", "URL", "Depth", "Status"])
 
             # Write all visited URLs
             for url in self.visited_urls:
                 status = "Broken" if url in self.broken_urls else "Working"
-                writer.writerow([url, self.url_depths[url], status, timestamp])
+                writer.writerow([timestamp, url, self.url_depths[url], status])
 
                 # Check file size after each write
                 if os.path.getsize(self.output_file) > max_file_size:
