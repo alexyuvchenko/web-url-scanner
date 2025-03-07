@@ -1,8 +1,5 @@
-FROM python:3.13.2-slim
+FROM python:3.13.1-slim
 
-ENV POETRY_HOME=/opt/poetry
-
-# Set working directory
 WORKDIR /app
 
 # Install system dependencies
@@ -12,20 +9,26 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Install poetry
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VIRTUALENVS_CREATE=false
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
     cd /usr/local/bin && \
     ln -s /opt/poetry/bin/poetry
 
-# Copy project files
+# Copy only dependency files first
 COPY pyproject.toml poetry.lock* ./
-COPY src/ ./src/
 
 # Install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+RUN poetry install --no-interaction --no-ansi --no-root
 
-# Create logs directory
-RUN mkdir -p logs
+# Copy source code
+COPY . .
+
+# Install the project
+RUN poetry install --no-interaction --no-ansi
+
+# Create logs directory with proper permissions
+RUN mkdir -p logs && chmod 777 logs
 
 # Set the entrypoint
 CMD ["poetry", "run", "python", "-m", "web_url_scanner.scanner"] 

@@ -3,9 +3,12 @@ name = "web-url-scanner"
 version = "0.1.0"
 description = "A Python script for scanning websites and generating URL reports"
 authors = ["Alexander Yuvchenko <alexander.yuvchenko@gmail.com>"]
+packages = [
+    { include = "web_url_scanner", from = "src" }
+]
 
 [tool.poetry.dependencies]
-python = "^3.13.2"
+python = "^3.13.1"
 httpx = "^0.28.1"
 
 [tool.poetry.group.dev.dependencies]
@@ -15,11 +18,11 @@ isort = "^6.0.1"
 
 [build-system]
 requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api" 
+build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 99
-target-version = ['py312']
+target-version = ['py313']
 
 [tool.isort]
 profile = "black"
